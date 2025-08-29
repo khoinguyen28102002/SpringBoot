@@ -3,6 +3,7 @@ package com.example.web_app.services;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.catalina.mapper.Mapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -22,41 +23,47 @@ public class BookService {
     private final BookRepository bookRepo;
 
     public List<BookResponseDTO> getAllBooks(){
-        List<Book> allBooks = bookRepo.getAllBooks();
-        List<BookResponseDTO> allBooksDTO = new ArrayList<>();
-        for(Book b: allBooks){
-            allBooksDTO.add(MapperBook.modelToResponseDto(b));
-        }
-        return allBooksDTO;
+        // List<Book> allBooks = bookRepo.findAll();
+        // List<BookResponseDTO> allBooksDTO = new ArrayList<>();
+        // for(Book b: allBooks){
+        //     allBooksDTO.add(MapperBook.modelToResponseDto(b));
+        // }
+        // return allBooksDTO;
+        return bookRepo.findAll().stream()
+                .map(MapperBook::modelToResponseDto)
+                .toList();
     }
 
-    public BookResponseDTO getBookByName(String name){
+    public List<BookResponseDTO> getBookByName(String name){
         if(name == ""){
-            throw new ApiException("Name book is not set", HttpStatus.BAD_REQUEST);
+            throw new ApiException("No id field!", HttpStatus.BAD_REQUEST);
         }
-        Book repoBook = bookRepo.getBookByName(name);
-        if(repoBook == null){
-            throw new ApiException("Not found book by name: " + name, HttpStatus.NOT_FOUND);
-        }
-        return MapperBook.modelToResponseDto(repoBook);
+        
+        return bookRepo.findBookByName(name).stream()
+                .map(MapperBook::modelToResponseDto)
+                .toList();
     }
+    
     public BookResponseDTO addNewBook(BookRequestDTO book){
         Book modelBook = MapperBook.dtoRequestToModel(book);
-        return MapperBook.modelToResponseDto(bookRepo.createBook(modelBook));
+        return MapperBook.modelToResponseDto(bookRepo.save(modelBook));
     }
 
     public BookResponseDTO updateBook(String id, BookRequestDTO book){
-        Book modelBook = MapperBook.dtoRequestToModel(book);
-        Book repositoryBook = bookRepo.updateBook(id, modelBook);
+        Book repositoryBook = bookRepo.findById(id).orElseThrow(
+            () -> new ApiException("Not found book by id: " + id, HttpStatus.NOT_FOUND)
+        );
 
-        if (repositoryBook == null) {
-            throw new ApiException("Not found book by id: " + id, HttpStatus.NOT_FOUND);
-        }
+        repositoryBook.setName(book.getName());
+        repositoryBook.setAuthor(book.getAuthor());
+        repositoryBook.setPrice(book.getPrice());
 
-        return MapperBook.modelToResponseDto(repositoryBook);
+        Book savedBook = bookRepo.save(repositoryBook);
+
+        return MapperBook.modelToResponseDto(savedBook);
     }
 
     public void deleteBook(String id){
-        bookRepo.deleteBook(id);
+        bookRepo.deleteById(id);
     }
 }
