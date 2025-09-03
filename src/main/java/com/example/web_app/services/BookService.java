@@ -41,7 +41,7 @@ public class BookService {
     
     public BookResponseDTO addNewBook(BookRequestDTO book){
         Book modelBook = MapperBook.dtoRequestToModel(book);
-        return MapperBook.modelToResponseDto(bookRepo.updateBook(modelBook));
+        return MapperBook.modelToResponseDto(bookRepo.addNewBook(modelBook));
     }
 
     public BookResponseDTO updateBook(String id, BookRequestDTO book){
