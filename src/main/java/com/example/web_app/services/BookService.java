@@ -23,12 +23,7 @@ public class BookService {
     private final BookRepository bookRepo;
 
     public List<BookResponseDTO> getAllBooks(){
-        // List<Book> allBooks = bookRepo.findAll();
-        // List<BookResponseDTO> allBooksDTO = new ArrayList<>();
-        // for(Book b: allBooks){
-        //     allBooksDTO.add(MapperBook.modelToResponseDto(b));
-        // }
-        // return allBooksDTO;
+
         return bookRepo.findAll().stream()
                 .map(MapperBook::modelToResponseDto)
                 .toList();
@@ -36,7 +31,7 @@ public class BookService {
 
     public List<BookResponseDTO> getBookByName(String name){
         if(name == ""){
-            throw new ApiException("No id field!", HttpStatus.BAD_REQUEST);
+            throw new ApiException("No name field!", HttpStatus.BAD_REQUEST);
         }
         
         return bookRepo.findBookByName(name).stream()
@@ -46,19 +41,20 @@ public class BookService {
     
     public BookResponseDTO addNewBook(BookRequestDTO book){
         Book modelBook = MapperBook.dtoRequestToModel(book);
-        return MapperBook.modelToResponseDto(bookRepo.save(modelBook));
+        return MapperBook.modelToResponseDto(bookRepo.updateBook(modelBook));
     }
 
     public BookResponseDTO updateBook(String id, BookRequestDTO book){
-        Book repositoryBook = bookRepo.findById(id).orElseThrow(
-            () -> new ApiException("Not found book by id: " + id, HttpStatus.NOT_FOUND)
-        );
+        Book repositoryBook = bookRepo.findById(id);
+        if(repositoryBook == null){
+            throw new ApiException("Not found book by id: " + id, HttpStatus.NOT_FOUND);
+        }
 
         repositoryBook.setName(book.getName());
         repositoryBook.setAuthor(book.getAuthor());
         repositoryBook.setPrice(book.getPrice());
 
-        Book savedBook = bookRepo.save(repositoryBook);
+        Book savedBook = bookRepo.updateBook(repositoryBook);
 
         return MapperBook.modelToResponseDto(savedBook);
     }
