@@ -12,6 +12,40 @@
       <strong>We're sorry but <%= htmlWebpackPlugin.options.title %> doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
     </noscript>
     <div id="app"></div>
-    <!-- built files will be auto injected -->
   </body>
 </html>
+<!-- <!DOCTYPE html>
+<html>
+
+<head>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js">
+    </script>
+</head>
+
+<body>
+    <div style="text-align: center;" id="app">
+
+         Rendering data to DOM 
+        <h1 style="color: seagreen;">{{title}}</h1>
+        <h2>Title : {{name}}</h2>
+        <h2>Topic : {{topic}}</h2>
+    </div>
+
+
+    <script>
+        // Creating Vue Instance
+        const { createApp } = Vue
+        const app = createApp({
+            data(){
+              return {
+                title: "Geeks for Geeks",
+                name: "Vue.js",
+                topic: "Instances"
+              }
+            }
+        });
+        app.mount('#app')
+    </script>
+</body>
+
+</html> -->
